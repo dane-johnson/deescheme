@@ -18,7 +18,7 @@ int hash(const char*);
 void insert_symbol(char*,struct object*);
 struct object* retrieve_symbol(const char*);
 
-typedef enum type {NUM, BOOL, CHAR, CONS, SYMBOL, FUNC, BUILTIN, L_EOF} type;
+typedef enum type {NUM, BOOL, CHAR, CONS, SYMBOL, FUNC, BUILTIN, L_EOF, NONE} type;
 
 typedef struct object {
   type type;
@@ -36,8 +36,9 @@ typedef struct object {
 #define QUOTED 1
 
 object nil = {CONS, {NULL, NULL}};
-char* builtins[] = { "def", "quote", "car", "cdr", "print" };
-#define NUM_BUILTINS 5
+object undefined = {NONE, -1};
+char* builtins[] = { "def", "quote", "car", "cdr", "print", "eval" };
+#define NUM_BUILTINS 6
 
 object* read(FILE*);
 object* read_pair(FILE*);

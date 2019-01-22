@@ -22,7 +22,15 @@ void insert_symbol(char* key, object* val) {
     entry* curr;
     curr = symbolmap[h];
     while(curr->next) {
+      if (strcmp(curr->key, key) == 0) {
+        curr->val = val;
+        return;
+      }
       curr = curr->next;
+    }
+    if (strcmp(curr->key, key) == 0) {
+      curr->val = val;
+      return;
     }
     curr->next = myentry;
   } else {
@@ -145,9 +153,11 @@ object* read_symbol(FILE* in) {
   if (c == ')') {
     ungetc (c, in);
   }
-  head[len] = '\0';
-  tablehead += len + 1;
+  if (!retrieve_symbol(head)) {
+    insert_symbol(head, &undefined);
+  }
   o->symbol = head;
+  tablehead += len + 1;
   if (is_builtin(o->symbol)) {
     o->type = BUILTIN;
   } else {
@@ -201,6 +211,11 @@ object* dofunc(object* func, object* argcons) {
     print(eval(argcons->car));
     printf("\n");
     return &nil;
+  } else if (strcmp("eval", func->symbol) == 0) {
+    return eval(eval(argcons->car));
+  } else {
+    fprintf(stderr, "void function %s", func->symbol);
+    return &nil;
   }
 }
 
@@ -232,8 +247,12 @@ void print(object* o) {
     print_pair(o);
     printf(")");
     break;
+  case BUILTIN:
   case SYMBOL:
     printf("%s", o->symbol);
+    break;
+  case NONE:
+    printf("undefined");
     break;
   }
 }
